@@ -3,6 +3,16 @@ import './App.css';
 import uuid from 'uuid';
 import firebase from 'firebase';
 
+var config = {
+   apiKey: process.env.REACT_APP_APIKEY,
+   authDomain: process.env.REACT_APP_AUTHDOMAIN,
+   databaseURL: "https://simplesurvey-c5126.firebaseio.com",
+   projectId: process.env.REACT_APP_PROJECT_ID,
+   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+   messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID
+ };
+
+firebase.initializeApp(config);
 
 class App extends Component {
   constructor(props){
@@ -30,7 +40,15 @@ class App extends Component {
   }
 
   handleQuestionSubmit(event){
-    console.log();
+    firebase.database().ref('surveys/' + this.state.id).set({
+      name: this.state.name,
+      answers: this.state.answers
+    });
+
+    this.setState({submitted: true}, function(){
+      console.log('Questions submitted...')
+    });
+    event.preventDefault();
   }
 
   handleQuestionChange(event){
@@ -84,6 +102,7 @@ class App extends Component {
               <input type="radio" name="q4" value="ARM" onChange={this.handleQuestionChange}/>ARM<br/>
               <input type="radio" name="q4" value="Other" onChange={this.handleQuestionChange}/>Other<br/>
             </div>
+            <input type="submit" value="Submit" />
           </form>
         </span>
       )
@@ -99,7 +118,7 @@ class App extends Component {
       )
 
     } else if(this.state.submitted === true){
-
+      user = <h2> Thank You {this.state.name}</h2>
     }
     return (
       <div className="App">
